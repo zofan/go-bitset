@@ -1,20 +1,19 @@
-package go_bitset
+package bitset
 
 import (
-	"github.com/zofan"
 	"testing"
 )
 
 func Test(t *testing.T) {
-	bs := zofan.New(128)
+	bs := New(128)
 
 	err := bs.Set(1234)
-	if err != zofan.ErrOutOfRange {
+	if err != ErrOutOfRange {
 		t.Error(`set 1234, expected ErrOutOfRange`)
 	}
 
 	err = bs.Unset(1234)
-	if err != zofan.ErrOutOfRange {
+	if err != ErrOutOfRange {
 		t.Error(`unset 1234, expected ErrOutOfRange`)
 	}
 

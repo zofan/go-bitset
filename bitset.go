@@ -1,4 +1,4 @@
-package go_bitset
+package bitset
 
 import (
 	"encoding/binary"
