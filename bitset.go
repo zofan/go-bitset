@@ -23,6 +23,10 @@ func New(size uint64) *BitSet {
 	}
 }
 
+func (bs *BitSet) Size() uint64 {
+	return bs.size
+}
+
 func (bs *BitSet) Reset() {
 	bs.set = make([]uint64, bs.size/64)
 }
