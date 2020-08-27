@@ -39,8 +39,8 @@ func Test(t *testing.T) {
 		t.Error(`test 5, expected true`)
 	}
 
-	dmp := bs.Bytes()
-	bs.Load(dmp)
+	dmp := bs.Marshal()
+	bs.Unmarshal(dmp)
 
 	err = bs.Unset(5)
 	if err != nil {
