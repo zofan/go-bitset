@@ -32,10 +32,8 @@ func (bs *BitSet) Reset() {
 }
 
 func (bs *BitSet) Unmarshal(raw []byte) {
-	bs.Reset()
-
 	bs.size = binary.BigEndian.Uint64(raw[0:])
-	bs.set = make([]uint64, bs.size/64)
+	bs.Reset()
 
 	for n := 0; uint64(n) < bs.size/64; n++ {
 		bs.set[n] = binary.BigEndian.Uint64(raw[(n*8)+8:])
@@ -55,10 +53,6 @@ func (bs *BitSet) Marshal() []byte {
 }
 
 func (bs *BitSet) Test(bitNum uint64) bool {
-	if bitNum > bs.size {
-		return false
-	}
-
 	i := bitNum / 64
 	b := bitNum % 64
 	bv := uint64(1 << (b - 1))
@@ -66,28 +60,16 @@ func (bs *BitSet) Test(bitNum uint64) bool {
 	return bs.set[i]&bv == bv
 }
 
-func (bs *BitSet) Set(bitNum uint64) error {
-	if bitNum > bs.size {
-		return ErrOutOfRange
-	}
-
+func (bs *BitSet) Set(bitNum uint64) {
 	i := bitNum / 64
 	b := bitNum % 64
 
-	bs.set[i] = bs.set[i] | (1 << (b - 1))
-
-	return nil
+	bs.set[i] |= 1 << (b - 1)
 }
 
-func (bs *BitSet) Unset(bitNum uint64) error {
-	if bitNum > bs.size {
-		return ErrOutOfRange
-	}
-
+func (bs *BitSet) Unset(bitNum uint64) {
 	i := bitNum / 64
-	b := uint64(bitNum % 64)
+	b := bitNum % 64
 
-	bs.set[i] = bs.set[i] &^ (1 << (b - 1))
-
-	return nil
+	bs.set[i] &= ^(1 << (b - 1))
 }
