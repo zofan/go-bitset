@@ -34,6 +34,7 @@ func (bs *BitSet) Reset() {
 	bs.set = make([]bits, bs.size/64)
 }
 
+// implement interface: BinaryUnmarshaler
 func (bs *BitSet) UnmarshalBinary(raw []byte) error {
 	bs.size = binary.BigEndian.Uint64(raw)
 	bs.Reset()
@@ -41,8 +42,11 @@ func (bs *BitSet) UnmarshalBinary(raw []byte) error {
 	for n := 0; uint64(n) < bs.size/64; n++ {
 		bs.set[n] = bits{bits: binary.BigEndian.Uint64(raw[(n*8)+8:])}
 	}
+
+	return nil
 }
 
+// implement interface: BinaryMarshaler
 func (bs *BitSet) MarshalBinary() ([]byte, error) {
 	raw := make([]byte, (len(bs.set)*8)+8)
 
