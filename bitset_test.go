@@ -13,13 +13,14 @@ func Test(t *testing.T) {
 
 	bs.Set(5)
 	bs.Set(9)
+	bs.Set(98)
 
 	if !bs.Test(5) {
 		t.Error(`test 5, expected true`)
 	}
 
-	dmp := bs.Marshal()
-	bs.Unmarshal(dmp)
+	_ = bs.SaveFile(`./bitset.csv`)
+	_ = bs.LoadFile(`./bitset.csv`)
 
 	bs.Unset(5)
 
