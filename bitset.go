@@ -14,7 +14,7 @@ type BitSet struct {
 
 type bits struct {
 	bits uint64
-	sync.Mutex
+	mu   sync.RWMutex
 }
 
 func New(size uint64) *BitSet {
@@ -38,23 +38,23 @@ func (bs *BitSet) Reset() {
 func (bs *BitSet) Test(bitNum uint64) bool {
 	v := uint64(1 << ((bitNum % 64) - 1))
 
-	bs.set[bitNum/64].Lock()
+	bs.set[bitNum/64].mu.RLock()
 	r := bs.set[bitNum/64].bits&v == v
-	bs.set[bitNum/64].Unlock()
+	bs.set[bitNum/64].mu.RUnlock()
 
 	return r
 }
 
 func (bs *BitSet) Set(bitNum uint64) {
-	bs.set[bitNum/64].Lock()
+	bs.set[bitNum/64].mu.Lock()
 	bs.set[bitNum/64].bits |= 1 << ((bitNum % 64) - 1)
-	bs.set[bitNum/64].Unlock()
+	bs.set[bitNum/64].mu.Unlock()
 }
 
 func (bs *BitSet) Unset(bitNum uint64) {
-	bs.set[bitNum/64].Lock()
+	bs.set[bitNum/64].mu.Lock()
 	bs.set[bitNum/64].bits &= ^(1 << ((bitNum % 64) - 1))
-	bs.set[bitNum/64].Unlock()
+	bs.set[bitNum/64].mu.Unlock()
 }
 
 func (bs *BitSet) LoadFile(file string) error {
@@ -96,9 +96,11 @@ func (bs *BitSet) SaveFile(file string) error {
 	defer fh.Close()
 
 	for _, bits := range bs.set {
+		bits.mu.RLock()
 		if _, err = fh.WriteString(strconv.Itoa(int(bits.bits)) + "\n"); err != nil {
 			return err
 		}
+		bits.mu.RUnlock()
 	}
 
 	return nil
